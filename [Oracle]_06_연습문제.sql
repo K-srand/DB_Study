@@ -1,6 +1,15 @@
 -- Q1. empno 열에는 emp 테이블에서 사원 이름이 다섯 글자 이상이며, 여섯 글자 미만인 사원 정보 출력
 -- masking_empno 열에는 사원 번호 앞 두 자리 외 뒷자리를 * 기호로 출력
 -- masking_ename 열에는 사원 이름의 첫 글자만 보여 주고 나머지 글자 수만큼 * 기호로 출력
+SELECT EMPNO,
+       RPAD(SUBSTR(EMPNO,1,2), 4, '*') AS MASKING_EMPNO,
+       ENAME,
+       RPAD(SUBSTR(ENAME,1,1), LENGTH(ENAME),'*') AS MASKING_ENAME 
+FROM EMP
+WHERE LENGTH(ENAME) >= 5
+AND LENGTH(ENAME) < 6;
+
+-- 추가 답안(글자 수 주의)
 SELECT EMPNO, 
        REPLACE(EMPNO, SUBSTR(EMPNO, 3, 2), '**') AS MASKING_EMPNO, 
        ENAME, 
@@ -19,14 +28,19 @@ FROM EMP;
 -- Q3. EMP 테이블에서 사원들은 입사일을 기준으로 3개월이 지난 후 첫 월요일에 정직원이 된다.
 -- 사원들이 정직원이 되는 날짜를 YYYY-MM-DD 형식으로 출력
 -- 단, 추가 수당이 없는 사원의 추가 수당은 N/A로 출력
+SELECT EMPNO, ENAME, HIREDATE,
+       TO_CHAR(NEXT_DAY(ADD_MONTHS(HIREDATE,3), '월요일'), 'YYYY-MM-DD') AS R_JOB,
+       NVL(TO_CHAR(COMM),'N/A') AS COMM
+FROM EMP;
+
+-- 추가 답안
 SELECT EMPNO, ENAME, HIREDATE, 
-       ADD_MONTHS(TO_DATE(HIREDATE), 3) AS R_JOB,
-       NVL2(TO_CHAR(COMM), TO_CHAR(COMM), 'N/A')
+       REPLACE(NEXT_DAY(ADD_MONTHS(HIREDATE,3),'월요일'),'/','-') AS R_JOB,
+       NVL(TO_CHAR(COMM), 'N/A') AS COMM
 FROM EMP;
 
 -- Q4. EMP 테이블의 모든 사원을 대상으로 직속 상관의 사원 번호를 다음과 같은 조건을 기준으로 변환해서 출력
 -- 직속 상관의 사원 번호가 존재하지 않을 경우
-
 SELECT EMPNO, ENAME, MGR,
        CASE
          WHEN MGR IS NULL THEN '0000'
@@ -37,3 +51,15 @@ SELECT EMPNO, ENAME, MGR,
          ELSE TO_CHAR(MGR)
        END AS CHG_MGR
 FROM EMP;
+
+-- 추가 답안
+SELECT EMPNO, ENAME, MGR,
+       CASE
+          WHEN MGR IS NULL THEN '0000'
+          WHEN SUBSTR(MGR, 1, 2) = '75' THEN '5555'
+          WHEN SUBSTR(MGR, 1, 2) = '76' THEN '6666'
+          WHEN SUBSTR(MGR, 1, 2) = '77' THEN '7777'
+          WHEN SUBSTR(MGR, 1, 2) = '78' THEN '8888'
+          ELSE TO_CHAR(MGR)
+       END AS CHG_MGR
+  FROM EMP;

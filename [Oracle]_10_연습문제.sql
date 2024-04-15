@@ -1,0 +1,81 @@
+CREATE TABLE CHAP10HW_EMP AS SELECT * FROM EMP;
+CREATE TABLE CHAP10HW_DEPT AS SELECT * FROM DEPT;
+CREATE TABLE CHAP10HW_SALGRADE AS SELECT * FROM SALGRADE;
+
+
+-- Q1. CHAP10HW_DEPT 테이블에 50, 60, 70, 80번 부서 등록
+SELECT *
+FROM CHAP10HW_DEPT;
+
+INSERT INTO CHAP10HW_DEPT(DEPTNO, DNAME, LOC)  VALUES (50, 'ORACLE', 'BUSAN');  -- 테이블명 뒤 속성명 생략 가능
+INSERT INTO CHAP10HW_DEPT(DEPTNO, DNAME, LOC)  VALUES (60, 'SQL', 'ILSAN');
+INSERT INTO CHAP10HW_DEPT(DEPTNO, DNAME, LOC)  VALUES (70, 'SELECT', 'INCHEON');
+INSERT INTO CHAP10HW_DEPT(DEPTNO, DNAME, LOC)  VALUES (80, 'DML', 'BUNDANG');
+
+--  Q2. CHAP10HW_EMP 테이블에 8명의 사원 정보 등록
+SELECT *
+FROM CHAP10HW_EMP;
+
+INSERT INTO CHAP10HW_EMP VALUES(7201, 'TEST_USER1', 'MANAGER', 7788, '2016-01-02', 4500, NULL, 50);
+INSERT INTO CHAP10HW_EMP VALUES(7202, 'TEST_USER2', 'CLERK', 7201, '2016-02-21', 1800, NULL, 50);
+
+-- Q3. CHAP10HW_EMP에 속한 사원 중 50번 부서에서 근무하는 사원들의 평균 급여보다 많은 급여를 받고 있는 사원들을 70번 부서로 옮기는 SQL문 작성
+SELECT *
+FROM CHAP10HW_EMP;
+
+-- 1) 50번 부서에서 근무하는 사원들의 평균 급여
+SELECT AVG(SAL)
+FROM CHAP10HW_EMP
+WHERE DEPTNO = 50;
+             
+-- 2) 50번 부서에서 근무하는 사원들의 평균 급여보다 많은 급여를 받고 있는 사원들
+SELECT EMPNO, SAL
+FROM CHAP10HW_EMP
+WHERE SAL > ALL (SELECT AVG(SAL)
+             FROM CHAP10HW_EMP
+             WHERE DEPTNO = 50);
+
+-- 3) 50번 부서에서 근무하는 사원들의 평균 급여보다 많은 급여를 받고 있는 사원들을 70번 부서로 옮김
+UPDATE CHAP10HW_EMP SET DEPTNO = 70
+WHERE SAL > ALL (SELECT AVG(SAL)
+             FROM CHAP10HW_EMP
+             WHERE DEPTNO = 50);
+
+-- Q4. CHAP10HW_EMP에 속한 사원 중, 60번 부서의 사원 중에 입사일이 가장 빠른 사원보다 늦게 입사한 사원의 급여를 10% 인상하고
+-- 80번 부서로 옮기는 SQL문 작성
+SELECT *
+FROM CHAP10HW_EMP;
+
+-- 1) 60번 부서의 사원 중 입사일이 가장 빠른 사원 출력
+SELECT MIN(HIREDATE)
+FROM CHAP10HW_EMP
+WHERE DEPTNO = 60;
+
+-- 2) 60번 부서의 사원 중 입사일이 가장 빠른 사원보다 늦게 입사한 사원 출력
+SELECT *
+FROM CHAP10HW_EMP
+WHERE HIREDATE > (SELECT MIN(HIREDATE)
+                    FROM CHAP10HW_EMP
+                    WHERE DEPTNO = 60);
+                    
+-- 3) 60번 부서의 사원 중에 입사일이 가장 빠른 사원보다 늦게 입사한 사원의 급여를 10% 인상하고 80번 부서로 옮김
+UPDATE CHAP10HW_EMP SET SAL = SAL + SAL * 0.1, DEPTNO = 80
+WHERE HIREDATE > (SELECT MIN(HIREDATE)
+                    FROM CHAP10HW_EMP
+                    WHERE DEPTNO = 60);
+                    
+-- Q4. CHAP10HW_EMP에 속한 사원 중 급여 등급이 5인 사원 삭제
+SELECT *
+FROM CHAP10HW_EMP;
+
+-- 1) CHAP10HW_EMP에 속한 사원 중 급여 등급이 5인 사원
+SELECT E.EMPNO, E.DEPTNO, S.GRADE
+FROM CHAP10HW_EMP E, CHAP10HW_SALGRADE S
+WHERE S.GRADE = 5
+GROUP BY E.EMPNO, E.DEPTNO, S.GRADE;
+
+-- 2) CHAP10HW_EMP에 속한 사원 중 급여 등급이 5인 사원 삭제
+DELETE FROM CHAP10HW_EMP
+WHERE
+
+
